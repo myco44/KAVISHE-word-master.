@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+<title>Kavishe Q&A Class - Quiz yenye Timer Kubwa kulingana na Swali</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f0f4ff;
+    margin: 0; padding: 0;
+    display: flex; flex-direction: column; align-items: center;
+    min-height: 100vh;
+    color: #2e3a87;
+  }
+  main {
+    width: 95%;
+    max-width: 680px;
+    background: #fff;
+    padding: 28px 36px 36px;
+    border-radius: 16px;
+    box-shadow: 0 0 24px rgba(65, 80, 166, 0.15);
+    box-sizing: border-box;
+    position: relative;
+  }
+  h1, h2 {
+    margin: 20px 0 18px;
+    text-align: center;
+    font-weight: 700;
+    user-select: none;
+  }
+  button {
+    background-color: #3f51b5;
+    color: white; border: none;
+    border-radius: 10px;
+    padding: 14px 28px;
+    margin: 10px 8px;
+    font-weight: 700;
+    font-size: 17px;
+    cursor: pointer;
+    transition: background-color 0.25s ease, box-shadow 0.2s ease;
+    box-shadow: 0 4px 10px rgba(63,81,181,0.35);
+    user-select: none;
+  }
+  button:hover:not(:disabled) {
+    background-color: #303f9f;
+    box-shadow: 0 6px 14px rgba(48,63,159,0.55);
+  }
+  button:disabled {
+    background: #888;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+  textarea, input[type="text"], input[type="password"], input[type="number"] {
+    width: 96%;
+    padding: 14px 16px;
+    margin: 12px 0 22px;
+    border: 2px solid #3949ab;
+    border-radius: 12px;
+    font-size: 18px;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    resize: vertical;
+  }
+  textarea:focus, input[type="text"]:focus, input[type="password"]:focus, input[type="number"]:focus {
+    border-color: #2e3a87;
+    box-shadow: 0 0 8px #3949abaa;
+    outline: none;
+  }
+  textarea {
+    min-height: 80px;
+    max-height: 180px;
+  }
+  .question-box, .result-box, .info-box {
+    background: #d1c4e9;
+    padding: 18px 22px;
+    border-radius: 14px;
+    margin-bottom: 18px;
+    line-height: 1.5;
+    box-shadow: 0 2px 12px rgba(209,196,233,0.65);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  .question-text {
+    max-width: 85%;
+  }
+  .result-box {
+    background: #c8e6c9;
+    box-shadow: 0 2px 12px rgba(200,230,201,0.7);
+    white-space: pre-line;
+    gap: 14px;
+    padding: 18px 24px;
+    border-radius: 14px;
+    margin-bottom: 20px;
+  }
+  .info-box {
+    background: #7986cb33;
+    color: #3949ab;
+    font-weight: 700;
+    text-align: center;
+    padding: 14px 18px;
+    border-radius: 12px;
+    user-select: none;
+    font-size: 16px;
+    margin-bottom: 20px;
+  }
+  .scrollable {
+    max-height: 410px;
+    overflow-y: auto;
+    margin-bottom: 20px;
+  }
+  .btn-delete {
+    background-color: #cc4444;
+    padding: 8px 14px;
+    font-size: 15px;
+    border-radius: 8px;
+    margin: 0 0 0 14px;
+    box-shadow: 0 2px 7px rgba(204,68,68,0.75);
+    align-self: flex-start;
+  }
+  .btn-delete:hover {
+    background-color: #aa3333;
+  }
+  .close-btn {
+    background-color: #cc4444;
+    margin-top: 25px;
+    box-shadow: 0 3px 9px rgba(204,68,68,0.65);
+  }
+  .pin-change-container {
+    border: 2px solid #3949ab;
+    padding: 18px 24px;
+    border-radius: 14px;
+    margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(57,73,171,0.4);
+  }
+  .pin-change-container h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-weight: 700;
+    color: #2e3a87;
+    text-align: center;
+  }
+  #progress-container {
+    width: 100%;
+    height: 20px;
+    background: #ccc9e6;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  #progress-bar {
+    height: 100%;
+    width: 0;
+    background: #4caf50;
+    border-radius: 12px;
+    transition: width 0.3s ease;
+  }
+  #modal-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    align-items: center; justify-content: center;
+    z-index: 9999;
+  }
+  #modal {
+    background: white;
+    padding: 28px 34px;
+    border-radius: 16px;
+    max-width: 380px;
+    box-shadow: 0 0 28px rgba(65, 80, 166, 0.5);
+    text-align: center;
+  }
+  #modal h3 {
+    margin: 0 0 16px;
+    font-weight: 700;
+    color: #2e3a87;
+  }
+  #modal p {
+    font-size: 16px;
+    color: #555;
+    margin-bottom: 20px;
+    white-space: pre-line;
+  }
+  #modal button {
+    padding: 12px 26px;
+    font-size: 16px;
+  }
+  .icon-tiki {
+    font-size: 48px;
+    font-weight: 900;
+    color: #4caf50;
+    user-select: none;
+    min-width: 60px;
+    text-align: center;
+    margin-right: 18px;
+    line-height: 1;
+  }
+  .icon-tiki-kidogo {
+    font-size: 42px;
+    font-weight: 700;
+    color: #8bc34a;
+    user-select: none;
+    min-width: 60px;
+    text-align: center;
+    margin-right: 18px;
+    line-height: 1;
+  }
+  .icon-krisi {
+    font-size: 56px;
+    font-weight: 900;
+    color: #f44336;
+    user-select: none;
+    min-width: 60px;
+    text-align: center;
+    margin-right: 18px;
+    line-height: 1;
+  }
+  @media (max-width: 520px) {
+    main {
+      padding: 22px 24px 28px;
+    }
+    button {
+      padding: 12px 20px;
+      font-size: 15px;
+      min-width: 90px;
+    }
+    textarea, input[type="text"] {
+      font-size: 16px;
+    }
+    .question-box {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .question-text {
+      max-width: 100%;
+      margin-bottom: 12px;
+    }
+    .btn-delete {
+      margin-left: 0;
+    }
+  }
+</style>
+</head>
+<body>
+
+<main id="app"></main>
+<!-- Modal -->
+<div id="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div id="modal">
+    <h3 id="modal-title"></h3>
+    <p id="modal-message"></p>
+    <button id="modal-close-btn" aria-label="Funga ujumbe">Sawa</button>
+  </div>
+</div>
+
+<script>
+  // Admin PIN (stored localStorage, default '1234')
+  let storedAdminPIN = localStorage.getItem('adminPIN') || '1234';
+  function getAdminPIN() { return storedAdminPIN; }
+  function setAdminPIN(newPIN) {
+    storedAdminPIN = newPIN;
+    localStorage.setItem('adminPIN', newPIN);
+  }
+
+  const PONGEZI = [
+    "Hongera! Umefanya vizuri sana!",
+    "Kazi nzuri, endelea hivyo!",
+    "Pongezi! Umekamilisha vizuri!",
+    "Nzuri sana, usiache kujifunza!",
+    "Umeonyesha maarifa mazuri!",
+    "Bora zaidi! Endelea kujifunza.",
+    "Safu nzuri, usikate tamaa!",
+    "Umefanya vizuri, usisite kujaribu tena!"
+  ];
+  const USHAURI = [
+    "Endelea kujifunza kwa bidii na utapata mafanikio.",
+    "Jitahidi kufafanua majibu yako kwa umakini zaidi.",
+    "Soma swali kwa makini zaidi kabla ya kujibu.",
+    "Jaribu kutumia mifano zaidi ili kuelewa.",
+    "Usikate tamaa, kila mazoezi huleta mafanikio.",
+    "Angalia vizuri na ujaribu tena mara nyingine.",
+    "Usijaribu tu, lakini ujifunze zaidi kila siku."
+  ];
+
+  // State ya programu
+  let state = {
+    screen: 'home',
+    pinInput: '',
+    maswaliList: JSON.parse(localStorage.getItem('maswaliList')) || [],
+    swaliJibuMoja: '',
+    darasaKuandika: '',
+    selectedDarasa: null,
+    quizMaswali: [],
+    currentIndex: 0,
+    jibuLako: '',
+    matokeo: [],
+    retryMode: false,
+    retryQuestions: []
+  };
+
+  const app = document.getElementById('app');
+
+  // Modal elements
+  const modalOverlay = document.getElementById('modal-overlay');
+  const modalTitle = document.getElementById('modal-title');
+  const modalMessage = document.getElementById('modal-message');
+  const modalCloseBtn = document.getElementById('modal-close-btn');
+  modalCloseBtn.onclick = () => hideModal();
+  modalOverlay.onclick = e => { if(e.target === modalOverlay) hideModal(); };
+  document.addEventListener('keydown', e => { if(e.key === 'Escape') hideModal(); });
+
+  function showModal(title, message){
+    modalTitle.textContent = title;
+    modalMessage.textContent = message;
+    modalOverlay.style.display = 'flex';
+  }
+  function hideModal() {
+    modalOverlay.style.display = 'none';
+  }
+
+  function saveMaswali() {
+    localStorage.setItem('maswaliList', JSON.stringify(state.maswaliList));
+  }
+
+  function normalizeText(text) {
+    return text.toLowerCase().trim().replace(/\s+/g, ' ');
+  }
+
+  function countMaswaliPerDarasa() {
+    const counts = {};
+    for(let d = 1; d <= 7; d++) counts[d] = 0;
+    state.maswaliList.forEach(q => {
+      if(counts[q.darasa] !== undefined) counts[q.darasa]++;
+    });
+    return counts;
+  }
+
+  function createButton(text, onClick, disabled = false, className = '') {
+    const btn = document.createElement('button');
+    btn.textContent = text;
+    btn.disabled = disabled;
+    btn.className = className;
+    btn.onclick = onClick;
+    return btn;
+  }
+
+  function tathminiJibu(userAnswer, correctAnswers) {
+    const rawUser = userAnswer.trim().toLowerCase();
+    const rawCorrect = correctAnswers.map(j => j.trim().toLowerCase());
+
+    if(rawCorrect.includes(rawUser)) {
+      const pongezi = PONGEZI[Math.floor(Math.random() * PONGEZI.length)];
+      const ushauri = USHAURI[Math.floor(Math.random() * USHAURI.length)];
+      return { score: 2, message: pongezi, ushauri };
+    }
+    for(const ans of rawCorrect) {
+      if(normalizeText(ans) === normalizeText(rawUser)) {
+        const pongezi = PONGEZI[Math.floor(Math.random() * PONGEZI.length)];
+        const ushauri = USHAURI[Math.floor(Math.random() * USHAURI.length)];
+        return { score: 1, message: `Pata vizuri! ${pongezi}`, ushauri };
+      }
+    }
+    return { score: 0, message: "Kosa! Jaribu tena.", ushauri: "Soma swali kwa makini na jaribu tena." };
+  }
+
+  // Timer variables
+  let timerInterval = null;
+
+  function startTimer(onTimeout, updateDisplay, timeLimit = 20) {
+    if(timerInterval) clearInterval(timerInterval);
+    let timeLeft = timeLimit;
+    updateDisplay(timeLeft);
+    timerInterval = setInterval(() => {
+      timeLeft--;
+      updateDisplay(timeLeft);
+      if(timeLeft <= 0) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        onTimeout();
+      }
+    }, 1000);
+  }
+  function clearTimer() {
+    if(timerInterval) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+    }
+  }
+
+  // Hesabu muda kulingana na maneno ya swali na jibu
+  function calculateTimeLimit(swali, jibu) {
+    const swaliWords = swali.trim().split(/\s+/).filter(Boolean).length;
+    const jibuWords = jibu.trim().split(/\s+/).filter(Boolean).length;
+    let time = 15 + (swaliWords * 5) + (jibuWords * 6);
+    if(time < 20) time = 20;
+    if(time > 180) time = 180; // max 3 mins
+    return time;
+  }
+
+  // Main rendering function
+  function render() {
+    app.innerHTML = '';
+    switch(state.screen) {
+      case 'home': renderHome(); break;
+      case 'adminLogin': renderAdminLogin(); break;
+      case 'adminDash': renderAdminDash(); break;
+      case 'quiz': renderQuiz(); break;
+      case 'result': renderResult(); break;
+      default:
+        app.innerHTML = '<p>Page haipatikani</p><button onclick="goHome()">Rudi Home</button>';
+    }
+  }
+
+  function renderHome() {
+    const h1 = document.createElement('h1');
+    h1.textContent = 'Karibu Kavishe Q&A Class - Chatbot ya Maswali na Majibu';
+    app.appendChild(h1);
+
+    app.appendChild(createButton('Admin Login (PIN)', () => {
+      state.screen = 'adminLogin';
+      render();
+    }));
+
+    const p = document.createElement('p');
+    p.textContent = 'Chagua darasa lako (1 - 7) kuanza kujibu maswali bila PIN';
+    p.style.fontWeight = '700';
+    p.style.marginTop = '20px';
+    app.appendChild(p);
+
+    const darasaDiv = document.createElement('div');
+    darasaDiv.className = 'darasa-buttons';
+
+    for(let d=1; d<=7; d++) {
+      const btn = createButton(`Darasa ${d}`, () => {
+        state.selectedDarasa = d;
+        state.quizMaswali = state.maswaliList.filter(q => q.darasa === d);
+        state.currentIndex = 0;
+        state.matokeo = [];
+        state.jibuLako = '';
+        state.retryMode = false;
+        state.retryQuestions = [];
+        state.screen = 'quiz';
+        render();
+      }, false, 'darasa-btn');
+      darasaDiv.appendChild(btn);
+    }
+    app.appendChild(darasaDiv);
+  }
+
+  function renderAdminLogin() {
+    const h2 = document.createElement('h2');
+    h2.textContent = 'Admin Login - Ingiza PIN';
+    app.appendChild(h2);
+
+    const inputPin = document.createElement('input');
+    inputPin.type = 'password';
+    inputPin.placeholder = 'Ingiza PIN';
+    inputPin.value = state.pinInput || '';
+    inputPin.autofocus = true;
+    inputPin.oninput = e => state.pinInput = e.target.value;
+    app.appendChild(inputPin);
+
+    app.appendChild(createButton('Ingia', () => {
+      if(state.pinInput === getAdminPIN()){
+        state.screen = 'adminDash';
+        state.pinInput = '';
+        render();
+      } else alert('PIN si sahihi!');
+    }));
+
+    app.appendChild(createButton('Rudi Home', () => {
+      state.screen = 'home';
+      state.pinInput = '';
+      render();
+    }, false, 'close-btn'));
+  }
+
+  function renderAdminDash() {
+    app.innerHTML = '';
+
+    const h2 = document.createElement('h2');
+    h2.textContent = 'Admin Dashboard - Ongeza Maswali Mengi & Badilisha PIN';
+    app.appendChild(h2);
+
+    const counts = countMaswaliPerDarasa();
+    const total = state.maswaliList.length;
+
+    const statsBox = document.createElement('div');
+    statsBox.className = 'info-box';
+    let statsText = 'Maswali kwa kila darasa: ';
+    for(let d=1; d<=7; d++){
+      statsText += `Darasa ${d}: ${counts[d]}  `;
+    }
+    statsText += `| Jumla: ${total}`;
+    statsBox.textContent = statsText;
+    app.appendChild(statsBox);
+
+    if(total === 0){
+      const p = document.createElement('p');
+      p.textContent = 'Hakuna maswali bado.';
+      app.appendChild(p);
+    } else {
+      const scrollDiv = document.createElement('div');
+      scrollDiv.className = 'scrollable';
+      state.maswaliList.forEach(item => {
+        const box = document.createElement('div');
+        box.className = 'question-box';
+
+        const qText = document.createElement('div');
+        qText.className = 'question-text';
+        qText.innerHTML = `<b>Darasa:</b> ${item.darasa}<br><b>Swali:</b> ${item.swali}<br><b>Jibu:</b> ${item.majibu[0]}`;
+
+        const delBtn = createButton('Futa', () => {
+          if(confirm(`Ungependa kufuta swali hili?\n\n"${item.swali}"`)) {
+            state.maswaliList = state.maswaliList.filter(q => q.id !== item.id);
+            saveMaswali();
+            renderAdminDash();
+          }
+        }, false, 'btn-delete');
+
+        box.appendChild(qText);
+        box.appendChild(delBtn);
+        scrollDiv.appendChild(box);
+      });
+      app.appendChild(scrollDiv);
+    }
+
+    // Textarea kuingiza maswali
+    const textareaMaswali = document.createElement('textarea');
+    textareaMaswali.placeholder = 'Andika maswali na majibu kwa mistari, mfano:\nSwali|Jibu|MudaSekunde\nMuda ni hiari, default 20 sekunde.';
+    textareaMaswali.rows = 10;
+    textareaMaswali.style.width = '100%';
+    textareaMaswali.style.fontSize = '16px';
+    app.appendChild(textareaMaswali);
+
+    const inputDarasa = document.createElement('input');
+    inputDarasa.type = 'number';
+    inputDarasa.placeholder = 'Darasa (1 - 7) kwa maswali haya yote';
+    inputDarasa.min = 1;
+    inputDarasa.max = 7;
+    inputDarasa.style.marginTop = '10px';
+    inputDarasa.style.padding = '12px 16px';
+    inputDarasa.style.fontSize = '16px';
+    inputDarasa.style.width = '100%';
+    app.appendChild(inputDarasa);
+
+    const addMaswaliBtn = createButton('Ongeza Maswali Mengi', () => {
+      const lines = textareaMaswali.value.trim().split('\n').filter(l => l.trim() !== '');
+      const darasaNum = Number(inputDarasa.value);
+
+      if(lines.length === 0){
+        alert('Tafadhali andika angalau swali moja.');
+        return;
+      }
+      if(!darasaNum || isNaN(darasaNum) || darasaNum < 1 || darasaNum > 7){
+        alert('Tafadhali ingiza darasa halali (1 - 7).');
+        return;
+      }
+
+      function normalizeSwali(text) {
+        return text.toLowerCase().trim().replace(/\s+/g, ' ');
+      }
+
+      const existingSet = new Set(state.maswaliList.filter(q => q.darasa === darasaNum).map(q => normalizeSwali(q.swali)));
+
+      let addedCount = 0;
+      let duplicatesCount = 0;
+
+      for(let i=0; i<lines.length; i++){
+        const line = lines[i].trim();
+        if(!line.includes('|')){
+          alert(`Hitilafu mstari ${i+1}: mstari lazima uwe na '|'. Mfano: Swali|Jibu|MudaSekunde`);
+          return;
+        }
+        const parts = line.split('|');
+        if(parts.length < 2){
+          alert(`Hitilafu mstari ${i+1}: Andika kama "Swali|Jibu|MudaSekunde" au "Swali|Jibu".`);
+          return;
+        }
+
+        const swali = parts[0].trim();
+        const jibu = parts[1].trim();
+        let muda = 20; // default
+
+        if(parts.length >= 3){
+          const val = Number(parts[2].trim());
+          if(!isNaN(val) && val > 0){
+            muda = val;
+          }
+        }
+        if(!swali || !jibu){
+          alert(`Hitilafu mstari ${i+1}: Swali au jibu halikujazwa.`);
+          return;
+        }
+
+        const normSwali = normalizeSwali(swali);
+        if(existingSet.has(normSwali)){
+          duplicatesCount++;
+          continue;
+        }
+
+        const newQ = {
+          id: Date.now().toString() + '-' + i,
+          darasa: darasaNum,
+          swali,
+          majibu: [jibu],
+          muda
+        };
+        state.maswaliList.push(newQ);
+        existingSet.add(normSwali);
+        addedCount++;
+      }
+
+      saveMaswali();
+
+      alert(`Maswali ${addedCount} yameongezwa kwa darasa ${darasaNum}.\nMaswali ${duplicatesCount} yalizuiliwa (yamekwisha kuwepo awali).\nIdadi mpya ya maswali kwa darasa hilo ni ${state.maswaliList.filter(q => q.darasa === darasaNum).length}.`);
+
+      textareaMaswali.value = '';
+      inputDarasa.value = '';
+
+      renderAdminDash();
+    });
+    addMaswaliBtn.style.marginTop = '14px';
+    app.appendChild(addMaswaliBtn);
+
+    // Pin change section
+    const pinContainer = document.createElement('div');
+    pinContainer.className = 'pin-change-container';
+
+    const pinTitle = document.createElement('h3');
+    pinTitle.textContent = 'Badilisha PIN ya Admin';
+    pinContainer.appendChild(pinTitle);
+
+    const currentPinInput = document.createElement('input');
+    currentPinInput.type = 'password';
+    currentPinInput.placeholder = 'Ingiza PIN ya sasa';
+    pinContainer.appendChild(currentPinInput);
+
+    const newPinInput = document.createElement('input');
+    newPinInput.type = 'password';
+    newPinInput.placeholder = 'Ingiza PIN mpya';
+    pinContainer.appendChild(newPinInput);
+
+    const confirmPinInput = document.createElement('input');
+    confirmPinInput.type = 'password';
+    confirmPinInput.placeholder = 'Thibitisha PIN mpya';
+    pinContainer.appendChild(confirmPinInput);
+
+    const changePinBtn = createButton('Badilisha PIN', () => {
+      const current = currentPinInput.value.trim();
+      const np = newPinInput.value.trim();
+      const cp = confirmPinInput.value.trim();
+
+      if(!current || !np || !cp){
+        alert('Jaza sehemu zote za kubadilisha PIN.');
+        return;
+      }
+      if(current !== getAdminPIN()){
+        alert('PIN ya sasa si sahihi.');
+        return;
+      }
+      if(np !== cp){
+        alert('PIN mpya na uthibitisho havilingani.');
+        return;
+      }
+      if(np.length < 4){
+        alert('PIN ni lazima iwe na angalau herufi 4.');
+        return;
+      }
+
+      setAdminPIN(np);
+      alert('PIN imebadilishwa kwa mafanikio.');
+
+      currentPinInput.value = '';
+      newPinInput.value = '';
+      confirmPinInput.value = '';
+    });
+    changePinBtn.style.marginTop = '12px';
+    pinContainer.appendChild(changePinBtn);
+    app.appendChild(pinContainer);
+
+    app.appendChild(createButton('Toka Admin Dashboard', () => {
+      state.screen = 'home';
+      render();
+    }, false, 'close-btn'));
+  }
+
+  function createProgressBar() {
+    const container = document.createElement('div');
+    container.id = 'progress-container';
+    const bar = document.createElement('div');
+    bar.id = 'progress-bar';
+    container.appendChild(bar);
+    return container;
+  }
+  function updateProgressBar() {
+    const bar = document.getElementById('progress-bar');
+    if(!bar) return;
+    const total = state.quizMaswali.length || 1;
+    const percent = Math.min(100, (state.currentIndex / total) * 100);
+    bar.style.width = percent + '%';
+  }
+
+  function renderQuiz() {
+    if(state.quizMaswali.length === 0){
+      app.innerHTML = '';
+      const h2 = document.createElement('h2');
+      h2.textContent = 'Hakuna maswali kwa darasa hili.';
+      app.appendChild(h2);
+      app.appendChild(createButton('Rudi Home', () => {
+        state.screen = 'home';
+        render();
+      }));
+      return;
+    }
+    const current = state.quizMaswali[state.currentIndex];
+    app.innerHTML = '';
+
+    const h2 = document.createElement('h2');
+    h2.textContent = `Darasa ${state.selectedDarasa} - Swali ${state.currentIndex + 1} kati ya ${state.quizMaswali.length}`;
+    app.appendChild(h2);
+
+    app.appendChild(createProgressBar());
+    updateProgressBar();
+
+    const timerDisplay = document.createElement('p');
+    timerDisplay.style.fontWeight = '700';
+    timerDisplay.style.fontSize = '18px';
+    timerDisplay.style.color = '#2e3a87';
+    timerDisplay.style.textAlign = 'center';
+    timerDisplay.style.userSelect = 'none';
+    timerDisplay.style.marginTop = '6px';
+    app.appendChild(timerDisplay);
+
+    const p = document.createElement('p');
+    p.style.fontSize = '20px';
+    p.style.margin = '14px 0 28px';
+    p.textContent = current.swali;
+    app.appendChild(p);
+
+    const textarea = document.createElement('textarea');
+    textarea.rows = 4;
+    textarea.placeholder = 'Andika jibu lako hapa';
+    textarea.value = state.jibuLako;
+    textarea.autofocus = true;
+    textarea.oninput = e => { state.jibuLako = e.target.value; };
+    app.appendChild(textarea);
+
+    const submitBtn = createButton('Tuma Jibu', () => {
+      clearTimer();
+      if(!state.jibuLako.trim()) {
+        showModal('Hitilafu', 'Tafadhali andika jibu kabla ya kutuma.');
+        return;
+      }
+      const result = tathminiJibu(state.jibuLako, current.majibu);
+      if(result.score === 0 && !state.retryMode){
+        if(!state.retryQuestions) state.retryQuestions = [];
+        state.retryQuestions.push(current);
+      }
+      state.matokeo.push({ swali: current.swali, jibu: state.jibuLako, ...result });
+      showModal(result.message, result.ushauri);
+      state.jibuLako = '';
+      if(state.currentIndex + 1 < state.quizMaswali.length){
+        state.currentIndex++;
+        renderQuiz();
+      } else {
+        if(state.retryQuestions.length > 0 && !state.retryMode){
+          state.quizMaswali = [...state.retryQuestions];
+          state.retryQuestions = [];
+          state.currentIndex = 0;
+          state.matokeo = [];
+          state.retryMode = true;
+          showModal('Retry Mode', 'Baada ya kumaliza, utajiuliza tena maswali uliyokosea.');
+          render();
+        } else {
+          state.screen = 'result';
+          render();
+        }
+      }
+    });
+    app.appendChild(submitBtn);
+
+    app.appendChild(createButton('Rudi Home', () => {
+      clearTimer();
+      state.screen = 'home';
+      render();
+    }, false, 'close-btn'));
+
+    // Amka timer na muda maalum
+    let timeLimit = 20;
+    if(typeof current.muda === 'number'){
+      timeLimit = current.muda;
+    } else if(current.majibu?.length > 0) {
+      timeLimit = calculateTimeLimit(current.swali, current.majibu[0]);
+    }
+
+    startTimer(() => {
+      showModal('Muda umeisha!', 'Hujajibu swali ndani ya muda uliotangazwa. Twende kwenye swali lijalo.');
+      handleTimeout(current, textarea, submitBtn);
+    }, timeLeft => {
+      timerDisplay.textContent = `Muda uliobaki: ${timeLeft} sekunde`;
+    }, timeLimit);
+  }
+
+  function handleTimeout(curSwali, textarea, submitBtn){
+    const result = {
+      score: 0,
+      message: 'Muda umeisha, swali limepitwa.',
+      ushauri: 'Jaribu haraka zaidi kwenye maswali yajayo.'
+    };
+    if(!state.retryMode){
+      if(!state.retryQuestions) state.retryQuestions = [];
+      state.retryQuestions.push(curSwali);
+    }
+    state.matokeo.push({ swali: curSwali.swali, jibu: '<Hakujibiwa>', ...result });
+    state.jibuLako = '';
+    if(state.currentIndex + 1 < state.quizMaswali.length){
+      state.currentIndex++;
+      renderQuiz();
+    } else {
+      if(state.retryQuestions.length > 0 && !state.retryMode){
+        state.quizMaswali = [...state.retryQuestions];
+        state.retryQuestions = [];
+        state.currentIndex = 0;
+        state.matokeo = [];
+        state.retryMode = true;
+        showModal('Retry Mode', 'Hii ni fursa ya kujibu tena maswali yaliyokosewa.');
+        render();
+      } else {
+        state.screen = 'result';
+        render();
+      }
+    }
+  }
+
+  function renderResult(){
+    app.innerHTML = '';
+    const h1 = document.createElement('h1');
+    h1.textContent = 'Matokeo ya Jaribio';
+    app.appendChild(h1);
+
+    const points = state.matokeo.reduce((a,c)=>a+c.score, 0);
+    const total = state.matokeo.length * 2;
+    const percent = total ? ((points/total)*100).toFixed(1) : 0;
+
+    const p = document.createElement('p');
+    p.style.fontSize = '22px';
+    p.style.marginBottom = '26px';
+    p.style.textAlign = 'center';
+    p.textContent = `Umepata alama ${points} kati ya ${total} (${percent}%)`;
+    app.appendChild(p);
+
+    const scrollDiv = document.createElement('div');
+    scrollDiv.className = 'scrollable';
+    state.matokeo.forEach(res=>{
+      const box = document.createElement('div');
+      box.className = 'result-box';
+
+      const icon = document.createElement('span');
+      if(res.score === 2) {
+        icon.textContent = '✓';
+        icon.className = 'icon-tiki';
+      } else if(res.score === 1) {
+        icon.textContent = '✓';
+        icon.className = 'icon-tiki-kidogo';
+      } else {
+        icon.textContent = '×';
+        icon.className = 'icon-krisi';
+      }
+      icon.style.userSelect = 'none';
+
+      const content = document.createElement('div');
+      content.innerHTML = `
+        <b>Swali:</b> ${res.swali}<br>
+        <b>Jibu lako:</b> ${res.jibu}<br>
+        <b>Tathmini:</b> ${res.message}<br>
+        <span style="font-style:italic; color:#555">${res.ushauri}</span>
+      `;
+      box.style.display = 'flex';
+      box.style.alignItems = 'center';
+      box.style.gap = '16px';
+      box.appendChild(icon);
+      box.appendChild(content);
+      scrollDiv.appendChild(box);
+    });
+    app.appendChild(scrollDiv);
+
+    app.appendChild(createButton('Rudi Home', () => {
+      state.screen = 'home';
+      state.retryMode = false;
+      render();
+    }, false, 'close-btn'));
+  }
+
+  function goHome(){
+    state.screen = 'home';
+    render();
+  }
+  window.goHome = goHome;
+
+  render();
+</script>
+
+</body>
+</html>
